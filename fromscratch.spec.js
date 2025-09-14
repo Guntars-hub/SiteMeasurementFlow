@@ -41,6 +41,10 @@ test('Site measurement flow', async ({ page }) => {
     //Choose first Go button, all buttons identical
     await page.getByRole('button',{name: 'Go'}).nth(0).click();
 
+    //Drag slider to 10 meters
+    await page.locator('input[type="range"]').fill('10');
+    await page.waitForTimeout(1000);
+    
     //Press confirm to start measuring
     await page.getByRole('button', {name: 'Confirm'}).click();
 

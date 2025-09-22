@@ -21,74 +21,18 @@ test('Complete subscription flow with payment and cancellation', async ({ page }
     console.log("Packages container loaded✅");
 
     //Scroll down within the packages section to make the 4th package visible
-    try {
-        // Method 1: Find the exact packages container and scroll it
-        const packagesContainer = await page.locator('div.flex.flex-col.gap-4.overflow-y-scroll.max-h-\\[450px\\]');
-        await packagesContainer.evaluate((element) => {
+    const packagesContainer = await page.locator('div.flex.flex-col.gap-4.overflow-y-scroll.max-h-\\[450px\\]');
+    await packagesContainer.evaluate((element) => {
             element.scrollTop = element.scrollHeight;
         });
-        console.log("Scrolled packages container✅");
-    } catch (e) {
-        try {
-            // Method 2: Use mouse wheel on the packages container
-            const packagesContainer = await page.locator('div.overflow-y-scroll');
-            await packagesContainer.hover();
-            await page.mouse.wheel(0, 1000);
-            await page.waitForTimeout(1000);
-            await page.mouse.wheel(0, 1000);
-            console.log("Scrolled using mouse wheel✅");
-        } catch (e2) {
-            try {
-                // Method 3: Use Page Down key multiple times
-                await page.keyboard.press('PageDown');
-                await page.waitForTimeout(500);
-                await page.keyboard.press('PageDown');
-                await page.waitForTimeout(500);
-                await page.keyboard.press('PageDown');
-                console.log("Scrolled using Page Down keys✅");
-            } catch (e3) {
-                console.log("All scroll methods failed");
-            }
-        }
-    }
+    console.log("Scrolled packages container✅");
 
     await page.waitForTimeout(2000);
     console.log("Scroll attempts completed✅");
 
     //Select the 4th package that costs 60 Cedi using multiple approaches
-    try {
-        // Method 1: Find button containing the "4" span
-        await page.locator('button:has(span:text("4"))').click();
-        console.log("4th package selected by button containing span '4'✅");
-    } catch (e) {
-        try {
-            // Method 2: Find button containing the price "60 Cedi"
-            await page.locator('button:has(code:text("60 Cedi"))').click();
-            console.log("4th package selected by button containing '60 Cedi'✅");
-        } catch (e2) {
-            try {
-                // Method 3: Use CSS selector for the specific button structure
-                await page.locator('button.flex.flex-col.relative').nth(3).click();
-                console.log("4th package selected by CSS class selector✅");
-            } catch (e3) {
-                try {
-                    // Method 4: Find by the exact text content
-                    await page.locator('button:has-text("60 Cedi / GH₵")').click();
-                    console.log("4th package selected by exact price text✅");
-                } catch (e4) {
-                    // Method 5: Last resort - find all buttons and click the 4th
-                    const allButtons = await page.locator('button').all();
-                    console.log(`Found ${allButtons.length} buttons`);
-                    if (allButtons.length >= 4) {
-                        await allButtons[3].click();
-                        console.log("4th package selected by button index✅");
-                    } else {
-                        console.log("Could not find 4th package❌");
-                    }
-                }
-            }
-        }
-    }
+    await page.locator('button:has(span:text("4"))').click();
+    console.log("4th package selected by button containing span '4'✅");
 
     //Press Next after selecting the package
     await page.getByText('Next').click();
@@ -214,6 +158,9 @@ test('Complete subscription flow with payment and cancellation', async ({ page }
     //Cancel subscription
     await page.getByText('Cancel subscription').nth(2).click();
     console.log("Cancel subscription pressed✅");
+    // Wait 3s, refresh, then wait 3s
+    await page.waitForTimeout(3000);
+    await page.reload();
     await page.waitForTimeout(3000);
     
     //Logout
